@@ -28,5 +28,3 @@ on localhost:5006 but you can change this port by changing port in resources > a
 
 Once your backend is running locally then you can run frontend app https://github.com/vaibhav50596/SmartGarbageFrontend or you can test
 backend with Postman.
-"# Digital-Health-interventions" 
-"# Digital-Health-interventions" 
