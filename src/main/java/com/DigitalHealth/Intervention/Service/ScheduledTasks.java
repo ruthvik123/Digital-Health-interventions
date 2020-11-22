@@ -10,7 +10,6 @@ public class ScheduledTasks {
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 	
-	@Scheduled(fixedRate = 5000)
 	public void reportCurrentTime() {
 		System.out.println("Time is " + printTime());
 	}
