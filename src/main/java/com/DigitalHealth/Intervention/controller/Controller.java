@@ -19,7 +19,7 @@ public class Controller {
     @GetMapping("/")
     public String test(){
         return "app started...";
-    }
+    }///
     
     @GetMapping("/qol/{userID}")
     public QOLQuestionnaire t1(@PathVariable String userID) { 

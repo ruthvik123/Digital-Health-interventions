@@ -37,7 +37,7 @@ public class QOLService {
 			questions.add(new Questions("aa","aa"));
 		} else {
 			questions.add(new Questions("aa","aa"));
-		}
+		}//
 		
 		if(physicalActivity) {
 			questions.add(new Questions("aa","aa"));

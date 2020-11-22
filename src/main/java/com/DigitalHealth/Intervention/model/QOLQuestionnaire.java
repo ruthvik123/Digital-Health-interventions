@@ -13,7 +13,7 @@ public class QOLQuestionnaire {
 	
 	public List<Questions> getQuestions(){
 		return Questions;
-	}
+	}//
 	
 	public void setQuestions(List<Questions> questions){
 		this.Questions = questions;

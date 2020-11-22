@@ -9,7 +9,7 @@ public class Questions{
 		this.Question = questionBody;
 		this.Type = questionType;
 	}
-
+//
 	public String getQuestion() {
 		return Question;
 	}
