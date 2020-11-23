@@ -30,7 +30,10 @@ public class Controller {
     
     @GetMapping("/qolList/{userID}")
     public QOLQuestionnaireList t1(@PathVariable String userID) { 
-    	return qolService.getQuestionnaireList(userID);
+    	if(userID.equals("admin")) {
+    		return qolService.getQuestionnaireList(userID);
+    	} 
+    	return null;
     }
     
     @GetMapping("/qol/{userID}/{questionnaireID}")
