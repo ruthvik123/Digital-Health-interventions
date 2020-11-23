@@ -33,7 +33,7 @@ public class Controller {
     	if(userID.equals("admin")) {
     		return qolService.getQuestionnaireList(userID);
     	} 
-    	return null;
+    	return new QOLQuestionnaireList();
     }
     
     @GetMapping("/qol/{userID}/{questionnaireID}")
