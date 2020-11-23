@@ -2,16 +2,18 @@ package com.DigitalHealth.Intervention.model;
 
 public class QOLAnswers {
 	
-	private String question;
+	private int id;
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	private String answer;
 	public QOLAnswers() {
 		
-	}
-	public String getQuestion() {
-		return question;
-	}
-	public void setQuestion(String question) {
-		this.question = question;
 	}
 	public String getAnswer() {
 		return answer;
@@ -22,6 +24,6 @@ public class QOLAnswers {
 	
 	@Override
 	public String toString() {
-		return String.format("question: "+question +" answer: "+ answer);
+		return String.format("question: "+id +" answer: "+ answer);
 	}
 }

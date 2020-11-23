@@ -5,17 +5,26 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 @Component
-public class QOLResponse {
+public class QOLResponseFromApp {
 
-	private List<QOLAnswers> answerList = new ArrayList();
+	private List<QOLAnswers> userResponse = new ArrayList();
 	private String userID;
+	private String questionnaireID;
 
-	public List<QOLAnswers> getAnswerList() {
-		return answerList;
+	public List<QOLAnswers> getUserResponse() {
+		return userResponse;
 	}
 
-	public void setAnswerList(List<QOLAnswers> answerList) {
-		this.answerList = answerList;
+	public void setUserResponse(List<QOLAnswers> userResponse) {
+		this.userResponse = userResponse;
+	}
+
+	public String getQuestionnaireID() {
+		return questionnaireID;
+	}
+
+	public void setQuestionnaireID(String questionnaireID) {
+		this.questionnaireID = questionnaireID;
 	}
 
 	public String getUserID() {
@@ -28,7 +37,7 @@ public class QOLResponse {
 
 	@Override
 	public String toString() {
-		return String.format("userID: "+userID.toString() +" answers: "+ answerList.toString());
+		return String.format("userID: "+userID.toString() +" questionnaireID: " + questionnaireID + " answers: "+ userResponse.toString());
 	}
 
 }

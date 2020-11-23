@@ -1,5 +1,8 @@
 package com.DigitalHealth.Intervention.controller;
 
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.DigitalHealth.Intervention.Service.QOLService;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
-import com.DigitalHealth.Intervention.model.QOLResponse;
+import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
 
 
 @RestController
@@ -30,7 +33,14 @@ public class Controller {
     }
     
     @PostMapping("/qol")
-	public void postQOL(@RequestBody QOLResponse response) {
-    	System.out.println(response.toString());
+	public String postQOL(@RequestBody QOLResponseFromApp response) throws IllegalArgumentException, IllegalAccessException {
+    	try {
+    		System.out.println(response.toString());	
+    	}
+    	catch(Exception e) {
+    		System.out.println(e);
+    		return "failure";
+    	}
+    	return "success";
     }
 }
