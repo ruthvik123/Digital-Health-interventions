@@ -1,30 +1,54 @@
 package com.DigitalHealth.Intervention.model;
 
 public class Questions{
-	String Question;
-	String Type;
+	int id;
+	String question;
+	String type;
+	String answer;
 	
-	public Questions(String questionBody, String questionType) {
+	
+	
+	public Questions(int id, String question, String type) {
 		super();
-		this.Question = questionBody;
-		this.Type = questionType;
+		this.id = id;
+		this.question = question;
+		this.type = type;
+		this.answer = "";
 	}
-//
+	
+	public Questions(int id, String question, String type, String answer) {
+		super();
+		this.id = id;
+		this.question = question;
+		this.type = type;
+		this.answer = answer;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getQuestion() {
-		return Question;
+		return question;
 	}
-
 	public void setQuestion(String question) {
-		Question = question;
+		this.question = question;
 	}
-
 	public String getType() {
-		return Type;
+		return type;
 	}
-
 	public void setType(String type) {
-		Type = type;
+		this.type = type;
 	}
+	public String getAnswer() {
+		return answer;
+	}
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+	
+	
 	
 	
 	

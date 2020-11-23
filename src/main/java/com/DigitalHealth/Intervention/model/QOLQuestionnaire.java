@@ -5,17 +5,17 @@ import java.util.List;
 public class QOLQuestionnaire {
 	
 	
-	private List<Questions> Questions;
+	private List<Questions> questions;
 
 	public QOLQuestionnaire(List<Questions> questions) {
-		this.Questions = questions;
+		this.questions = questions;
 	}
 	
 	public List<Questions> getQuestions(){
-		return Questions;
+		return questions;
 	}//
 	
 	public void setQuestions(List<Questions> questions){
-		this.Questions = questions;
+		this.questions = questions;
 	}
 }

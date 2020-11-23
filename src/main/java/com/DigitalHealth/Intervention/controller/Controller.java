@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.DigitalHealth.Intervention.Service.QOLService;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
+import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
 
 
@@ -27,9 +28,14 @@ public class Controller {
         return "app started...";
     }///
     
-    @GetMapping("/qol/{userID}")
-    public QOLQuestionnaire t1(@PathVariable String userID) { 
-    	return qolService.getQuestionnaire(userID);
+    @GetMapping("/qolList/{userID}")
+    public QOLQuestionnaireList t1(@PathVariable String userID) { 
+    	return qolService.getQuestionnaireList(userID);
+    }
+    
+    @GetMapping("/qol/{userID}/{questionnaireID}")
+    public QOLQuestionnaire t1(@PathVariable String userID,@PathVariable int questionnaireID) { 
+    	return qolService.getQuestionnaire(userID,questionnaireID);
     }
     
     @PostMapping("/qol")
