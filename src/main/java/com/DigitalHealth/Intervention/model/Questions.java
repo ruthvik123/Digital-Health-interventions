@@ -16,6 +16,9 @@ public class Questions{
 		this.answer = "";
 	}
 	
+	public Questions() {
+	}
+	
 	public Questions(int id, String question, String type, String answer) {
 		super();
 		this.id = id;

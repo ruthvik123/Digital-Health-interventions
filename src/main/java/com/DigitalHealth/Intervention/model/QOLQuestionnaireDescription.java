@@ -9,6 +9,8 @@ public class QOLQuestionnaireDescription {
 		this.id = id;
 		this.status = status;
 	}
+	
+	public QOLQuestionnaireDescription() {}
 
 	public int getId() {
 		return id;

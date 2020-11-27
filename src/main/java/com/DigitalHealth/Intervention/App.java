@@ -15,14 +15,4 @@ public class App
         System.out.println("starting an app");
         SpringApplication.run(App.class, args);
     }
-
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/getgarbage").allowedOrigins("http://localhost:4200");
-//                registry.addMapping("/postgarbage").allowedOrigins("http://localhost:4200");
-//            }
-//        };
-//    }
 }

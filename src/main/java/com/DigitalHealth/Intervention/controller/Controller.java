@@ -30,10 +30,7 @@ public class Controller {
     
     @GetMapping("/qolList/{userID}")
     public QOLQuestionnaireList t1(@PathVariable String userID) { 
-    	if(userID.equals("admin")) {
-    		return qolService.getQuestionnaireList(userID);
-    	} 
-    	return new QOLQuestionnaireList();
+    		return qolService.getQuestionnaireList(userID);	
     }
     
     @GetMapping("/qol/{userID}/{questionnaireID}")
@@ -50,6 +47,7 @@ public class Controller {
     		System.out.println(e);
     		return "failure";
     	}
+    	qolService.updateAnswersToTable(response);
     	return "success";
     }
 }
