@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.DigitalHealth.Intervention.Service.QOLService;
+import com.DigitalHealth.Intervention.Service.UtilityService;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
@@ -22,6 +23,9 @@ public class Controller {
 	
 	@Autowired
 	QOLService	qolService;
+	
+	@Autowired
+	UtilityService us;
 
     @GetMapping("/")
     public String test(){
@@ -36,6 +40,12 @@ public class Controller {
     @GetMapping("/qol/{userID}/{questionnaireID}")
     public QOLQuestionnaire t1(@PathVariable String userID,@PathVariable int questionnaireID) { 
     	return qolService.getQuestionnaire(userID,questionnaireID);
+    }
+    
+    // API To test Utility Functions
+    @GetMapping("/test/{userID}/{window}")
+    public int testFunc(@PathVariable int userID,@PathVariable int window) { 
+    	return us.getCallDuration(userID, window);
     }
     
     @PostMapping("/qol")

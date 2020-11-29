@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -49,9 +50,11 @@ public class QOLService {
 		}
 	}
 	
-	
 	@Autowired
 	NamedParameterJdbcTemplate namedjdbcTemplate;
+	
+	@Autowired
+	UtilityService us;
 	
 	
 	public QOLQuestionnaireList getQuestionnaireList(String userID) {
@@ -100,6 +103,8 @@ public class QOLService {
 		boolean physicalActivity = false;
 		boolean ambientNoise = false;
 		boolean alarmMap = false;
+		
+		System.out.println("Call duration is " + us.getCallDuration(Integer.parseInt(userID), 24));
 		
 		int count = 1;
 		
@@ -166,17 +171,23 @@ public class QOLService {
 	}
 	
 	public void updateAnswersToTable(QOLResponseFromApp response) {
-		
+		SqlParameterSource namedParams;
 		for(QOLAnswers ans : response.getUserResponse()) {
 			String sql = "UPDATE Questions_table\r\n" + 
 					"SET answer = :ANS " + 
 					"WHERE questionnaire_id  = :questionnaireID AND question_id = :questionID ;";
-			SqlParameterSource namedParams = new MapSqlParameterSource("ANS",ans.getAnswer())
+			namedParams = new MapSqlParameterSource("ANS",ans.getAnswer())
 					.addValue("questionnaireID", response.getQuestionnaireID())
 					.addValue("questionID", ans.getId());
 			namedjdbcTemplate.update(sql,namedParams);
 					
 		}
+		
+		String sql_updateQuestionnaire = "UPDATE Questionnaire_table \r\n" + 
+									"SET status = 'Completed' " + 
+									"WHERE questionnaire_id  = :questionnaireID ;";
+		namedParams = new MapSqlParameterSource("questionnaireID",response.getQuestionnaireID());
+		namedjdbcTemplate.update(sql_updateQuestionnaire,namedParams);
 		
 	}
 	
