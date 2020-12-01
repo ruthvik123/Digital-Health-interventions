@@ -104,7 +104,7 @@ public class QOLService {
 		boolean ambientNoise = false;
 		boolean alarmMap = false;
 		
-		System.out.println("Call duration is " + us.getCallDuration(Integer.parseInt(userID), 24));
+		System.out.println("Call duration is " + us.getCallDuration(userID, 24));
 		
 		int count = 1;
 		

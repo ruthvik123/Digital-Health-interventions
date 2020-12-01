@@ -44,8 +44,8 @@ public class Controller {
     
     // API To test Utility Functions
     @GetMapping("/test/{userID}/{window}")
-    public int testFunc(@PathVariable int userID,@PathVariable int window) { 
-    	return us.getCallDuration(userID, window);
+    public double testFunc(@PathVariable String userID,@PathVariable int window) { 
+    	return us.getDeviceUsage(userID, window);
     }
     
     @PostMapping("/qol")
