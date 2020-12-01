@@ -155,7 +155,7 @@ public class QOLService {
 			questions.add(new Questions(count, "Placeholder1","Text"));
 			count++;
 		} else {
-			questions.add(new Questions(count, "Placeholder2","Rating"));
+			questions.add(new Questions(count, "Placeholder2","Text"));
 			count++;
 		}
 		insertPendingQuestions(questions,questionnaireID);
