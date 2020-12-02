@@ -73,7 +73,7 @@ public class UtilityService {
 		long windowMilli = getTimestamp(windowInHours);
 		
 		String sql = "SELECT SUM(JSON_EXTRACT(data, '$.call_duration')) \r\n"
-				+ "AS 'call_duration' FROM mhdp.calls where device_id=(SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
+				+ "AS 'call_duration' FROM mhdp.calls where device_id IN (SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
 				+ "AND (JSON_EXTRACT(data, '$.timestamp')) > :windowMilli  group by device_id;";
 
 		SqlParameterSource namedParams = new MapSqlParameterSource("userID", userID).addValue("windowMilli",
@@ -95,16 +95,16 @@ public class UtilityService {
 		long windowMilli = getTimestamp(windowInHours);
 		
 		String sql = "SELECT COUNT(JSON_EXTRACT(data, '$.double_decibels')) \r\n"
-				+ "AS 'high_decibel' FROM mhdp.plugin_ambient_noise where device_id=(SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
+				+ "AS 'high_decibel' FROM mhdp.plugin_ambient_noise where device_id IN (SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
 				+ "AND (JSON_EXTRACT(data, '$.timestamp')) > :windowMilli AND JSON_EXTRACT(data, '$.double_decibels') > 80 \r\n"
 				+ " group by device_id;";
 
 		SqlParameterSource namedParams = new MapSqlParameterSource("userID", userID).addValue("windowMilli",
 				windowMilli);
-		int callDuration;
+		int loudNoiseInstances;
 		try {
-			callDuration = namedjdbcTemplate.queryForObject(sql, namedParams, Integer.class);
-			return callDuration;
+			loudNoiseInstances = namedjdbcTemplate.queryForObject(sql, namedParams, Integer.class);
+			return loudNoiseInstances;
 
 		} catch (Exception e) {
 			System.out.println(e.getStackTrace());
@@ -117,22 +117,33 @@ public class UtilityService {
 		
 		long windowMilli = getTimestamp(windowInHours);
 		
-		String sql = "SELECT COUNT(JSON_EXTRACT(data, '$.double_decibels')) \r\n"
-				+ "AS 'high_decibel' FROM mhdp.plugin_ambient_noise where device_id=(SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
-				+ "AND (JSON_EXTRACT(data, '$.timestamp')) > :windowMilli AND JSON_EXTRACT(data, '$.double_decibels') > 80 \r\n"
-				+ " group by device_id;";
+		String sql = "SELECT SUM((JSON_EXTRACT(data, '$.high_activity_time')*2)+(JSON_EXTRACT(data, '$.moderate_activity_time'))) \r\n"
+				+ "AS 'physical_activity' FROM mhdp.plugin_activity_analysis where device_id IN(SELECT device_id FROM mhdp.device_id where user_id = :userID) \r\n"
+				+ "AND (JSON_EXTRACT(data, '$.timestamp')) > :windowMilli \r\n"
+				+ "group by device_id;";
 
 		SqlParameterSource namedParams = new MapSqlParameterSource("userID", userID).addValue("windowMilli",
 				windowMilli);
-		int callDuration;
+		int activity;
 		try {
-			callDuration = namedjdbcTemplate.queryForObject(sql, namedParams, Integer.class);
-			return callDuration;
+			activity = namedjdbcTemplate.queryForObject(sql, namedParams, Integer.class);
+			return activity;
 
 		} catch (Exception e) {
 			System.out.println(e.getStackTrace());
 			return -1;
 		}
+	}
+	
+	public double getCallScore(String userID){
+		int callDuration = getCallDuration(userID, 7*24);
+		double score = 0;
+		if(callDuration > 30) {
+			score = 100;
+		} else if(callDuration != -1){
+			score = (double)callDuration / (double) (0.3);
+		}
+		return score;
 	}
 
 }

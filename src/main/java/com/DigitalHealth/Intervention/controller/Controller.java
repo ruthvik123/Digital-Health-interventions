@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.DigitalHealth.Intervention.Service.PeerSupportService;
 import com.DigitalHealth.Intervention.Service.QOLService;
 import com.DigitalHealth.Intervention.Service.UtilityService;
+import com.DigitalHealth.Intervention.model.PeerResponse;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
@@ -23,6 +25,9 @@ public class Controller {
 	
 	@Autowired
 	QOLService	qolService;
+	
+	@Autowired
+	PeerSupportService	peerSupportService;
 	
 	@Autowired
 	UtilityService us;
@@ -59,5 +64,10 @@ public class Controller {
     	}
     	qolService.updateAnswersToTable(response);
     	return "success";
+    }
+    
+    @GetMapping("/peer/{userID}")
+    public PeerResponse getPEER(@PathVariable String userID) { 
+    	return peerSupportService.getPeerGroup(userID);
     }
 }
