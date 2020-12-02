@@ -172,6 +172,7 @@ public class QOLService {
 	
 	public void updateAnswersToTable(QOLResponseFromApp response) {
 		SqlParameterSource namedParams;
+		// UPDATE QUESTIONS TABLE
 		for(QOLAnswers ans : response.getUserResponse()) {
 			String sql = "UPDATE Questions_table\r\n" + 
 					"SET answer = :ANS " + 
@@ -183,11 +184,27 @@ public class QOLService {
 					
 		}
 		
+		// UPDATE QUESTIONNAIRE TABLE
 		String sql_updateQuestionnaire = "UPDATE Questionnaire_table \r\n" + 
 									"SET status = 'Completed' " + 
 									"WHERE questionnaire_id  = :questionnaireID ;";
 		namedParams = new MapSqlParameterSource("questionnaireID",response.getQuestionnaireID());
 		namedjdbcTemplate.update(sql_updateQuestionnaire,namedParams);
+		
+		// UPDATE WORK LIST TABLE
+		String sql_updateWorkList = "INSERT INTO worklist_Table (userId, message, status, timestamp)\r\n" + 
+				"VALUES (:userID, :message, :status, :timestp);";
+		java.util.Date date = new java.util.Date();
+		Object timeStamp = new java.sql.Timestamp(date.getTime());
+		
+		namedParams = new MapSqlParameterSource("userID", response.getUserID())
+				.addValue("message", "Completed QOL "+response.getQuestionnaireID())
+				.addValue("status", "Pending")
+				.addValue("timestp", timeStamp);
+       
+		namedjdbcTemplate.update(sql_updateWorkList,namedParams);
+		
+		
 		
 	}
 	
