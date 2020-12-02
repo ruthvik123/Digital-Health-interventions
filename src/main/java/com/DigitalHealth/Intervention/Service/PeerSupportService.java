@@ -12,10 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import com.DigitalHealth.Intervention.Service.QOLService.getQuestionnaireRowMapper;
 import com.DigitalHealth.Intervention.model.PeerResponse;
-import com.DigitalHealth.Intervention.model.QOLQuestionnaireDescription;
-import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 
 @Component
 public class PeerSupportService {

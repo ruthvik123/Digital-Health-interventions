@@ -1,6 +1,8 @@
 package com.DigitalHealth.Intervention.Service;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,26 +16,31 @@ import org.apache.commons.math3.ml.clustering.Clusterer;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.DigitalHealth.Intervention.model.PeerResponse;
+
+
 @Component
 public class ScheduledTasks {
 
 	@Autowired
 	NamedParameterJdbcTemplate namedjdbcTemplate;
+	JdbcTemplate jdbcTemplate;
 	UtilityService us;
 	
 	@Scheduled(fixedRate = 1000*60*60*24)
 	public void pollAllUsers() {
-		List<Integer> userList;
+		List<String> userList;
 		String sql = "SELECT DISTINCT user_id FROM mhdp.device_id;";
 		try {
-			userList =  namedjdbcTemplate.queryForList(sql,new HashMap<String,String>(),Integer.class);
-			// function which takes in this list and checks for interventions
-			// function which takes in this list and Clusters it
+			userList =  namedjdbcTemplate.queryForList(sql,new HashMap<String,String>(),String.class);
 			System.out.println(userList);
 		}
 		catch(Exception e) {
@@ -92,11 +99,11 @@ public class ScheduledTasks {
 			
 			double dimensions[] = new double[5];
 			
-			dimensions[0] = (double)us.getCallDuration(user, 24);
-			dimensions[1] = (double)us.getAmbientNoise(user, 24);
-			dimensions[2] = (double)us.getPhysicalActivity(user, 24);
-			dimensions[3] = (double)us.getDeviceUsage(user, 24);
-			dimensions[4] = (double)us.getToneAnalysis(user, 24);
+			dimensions[0] = (double)us.getCallScore(user, 7*24);
+			dimensions[1] = (double)us.getAmbientNoiseScore(user, 7*24);
+			dimensions[2] = (double)us.getPhysicalActivityScore(user, 7*24);
+			dimensions[3] = (double)us.getDeviceUsageScore(user, 7*24);
+			dimensions[4] = (double)us.getToneScore(user, 7*24);
 			
 			DoublePoint vector = new DoublePoint(dimensions);
 			Data.add(vector);
@@ -114,20 +121,29 @@ public class ScheduledTasks {
 		
 		List<? extends Cluster<DoublePoint>> res = clusterer.cluster(Data);
 		
-		int idCounter = 1;
-		
-		for (Cluster<DoublePoint> re : res) {
-	         List<DoublePoint> points = re.getPoints();
-	         for(DoublePoint DP : points) {
-	        	 Queue q = map.get(DP);
-	        	 String PatientName = (String) q.poll();
-	        	 String sql = "INSERT INTO peer_table (peergroup_id, userId)\r\n" + 
-	 					"VALUES (:peergroupID, :userID);";
-	        	 SqlParameterSource namedParams = new MapSqlParameterSource("peergroupID", idCounter)
-	 					.addValue("userID", PatientName);
-	         }
-	        idCounter++;
-	    }
+		try {
+			String sql0 = "DELETE FROM mhdp.peer_table;";
+			jdbcTemplate.update(sql0);
+			
+			int idCounter = 1;
+			
+			for (Cluster<DoublePoint> re : res) {
+		         List<DoublePoint> points = re.getPoints();
+		         for(DoublePoint DP : points) {
+		        	 Queue<String> q = map.get(DP);
+		        	 String PatientName = (String) q.poll();
+		        	 String sql = "INSERT INTO peer_table (peergroup_id, userId)\r\n" + 
+		 					"VALUES (:peergroupID, :userID);";
+		        	 SqlParameterSource namedParams = new MapSqlParameterSource("peergroupID", idCounter)
+		 					.addValue("userID", PatientName);
+		        	 namedjdbcTemplate.update(sql,namedParams);
+		         }
+		        idCounter++;
+		    }
+		}	
+		catch(Exception e) {
+			System.out.println(e);
+		}
 
 	}
 }
