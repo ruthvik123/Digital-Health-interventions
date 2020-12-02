@@ -12,12 +12,9 @@ import com.DigitalHealth.Intervention.Service.UtilityService;
 
 @SpringBootApplication
 @EnableScheduling
-public class App 
-{
-	
-	
-    public static void main( String[] args ) {
-        System.out.println("starting an app");
-        SpringApplication.run(App.class, args);
-    }
+public class App {
+	public static void main(String[] args) {
+		System.out.println("starting an app");
+		SpringApplication.run(App.class, args);
+	}
 }
