@@ -96,22 +96,22 @@ public class QOLService {
 		
 	}
 	
+	
 	public QOLQuestionnaire getQuestionnairePending(String userID, int questionnaireID) {
-		boolean calling = false;
-		boolean messaging = false;
-		boolean socialMedia = false;
-		boolean physicalActivity = false;
-		boolean ambientNoise = false;
-		boolean alarmMap = false;
+		double calling = us.getCallScore(userID, 7*24);
+		double tone = us.getToneScore(userID, 7*24);
+		double deviceUsage = us.getDeviceUsage(userID, 7*24);
+		double physicalActivity = us.getPhysicalActivityScore(userID, 7*24);
+		double ambientNoise = us.getAmbientNoiseScore(userID, 7*24);
+		double alarmMap = us.getAlarmScore(userID, 7*24);
 		
-		System.out.println("Call duration is " + us.getCallDuration(userID, 24));
 		
 		int count = 1;
 		
 		List<Questions> questions = new ArrayList<>();
 		
 		
-		if(calling) {
+		if(calling >= 50) {
 			questions.add(new Questions(count, "Explain on what topics do you spend the most time on the phone", "Text"));
 			count++;
 		} else {
@@ -119,7 +119,7 @@ public class QOLService {
 			count++;
 		}
 		
-		if(messaging) {
+		if(tone >= 50) {
 			questions.add(new Questions(count, "While messaging, how well aware are you of your surroundings","Rating"));
 			count++;
 		} else {
@@ -127,7 +127,7 @@ public class QOLService {
 			count++;
 		}
 		
-		if(socialMedia) {
+		if(deviceUsage >= 50) {
 			questions.add(new Questions(count, "Is your social media interactions affecting your daily tasks?","Rating"));
 			count++;
 		} else {
@@ -135,7 +135,7 @@ public class QOLService {
 			count++;
 		}//
 		
-		if(physicalActivity) {
+		if(physicalActivity < 50) {
 			questions.add(new Questions(count, "Does your body shape affect you mentally and hinders with your productivity?","Yes/No"));
 			count++;
 		} else {
@@ -143,7 +143,7 @@ public class QOLService {
 			count++;
 		}
 		
-		if(ambientNoise) {
+		if(ambientNoise >= 50) {
 			questions.add(new Questions(count, "How stressful do you feel in your daily life?","Rating"));
 			count++;
 		} else {
@@ -151,7 +151,7 @@ public class QOLService {
 			count++;
 		}
 		
-		if(alarmMap) {
+		if(alarmMap >= 50) {
 			questions.add(new Questions(count, "Placeholder1","Text"));
 			count++;
 		} else {
