@@ -1,5 +1,6 @@
 package com.DigitalHealth.Intervention.Service;
 
+import java.io.StringWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +33,9 @@ public class ScheduledTasks {
 
 	@Autowired
 	NamedParameterJdbcTemplate namedjdbcTemplate;
+	@Autowired
 	JdbcTemplate jdbcTemplate;
+	@Autowired
 	UtilityService us;
 	
 	@Scheduled(fixedRate = 1000*60*60*24)
@@ -42,9 +45,11 @@ public class ScheduledTasks {
 		try {
 			userList =  namedjdbcTemplate.queryForList(sql,new HashMap<String,String>(),String.class);
 			System.out.println(userList);
+			getIntervention(userList);
+			clustering(userList);
 		}
 		catch(Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 	}
@@ -56,19 +61,26 @@ public class ScheduledTasks {
 			
 			String interventionValue = "";
 			
-			if(us.getCallDuration(user,24*30) > 119 ) { // threshold value selected after research
-				interventionValue = interventionValue + "High calls | ";
+			if(us.getCallScore(user,24*7) < 25 ) { // threshold value selected after research
+				interventionValue = interventionValue + "High Calls,";
 			}
-			if(us.getAmbientNoise(user,24) > 55) { 
-				interventionValue = interventionValue + "High noise | ";
+			if(us.getAmbientNoiseScore(user,24*7) < 25) { 
+				interventionValue = interventionValue + "Loud Noise,";
 			}
-			if(us.getPhysicalActivity(user,24) < 45) { 
-				interventionValue = interventionValue + "Low Physical Activity | ";
+			if(us.getPhysicalActivityScore(user,24*7) < 25) { 
+				interventionValue = interventionValue + "Low Physical Activity,";
 			}
-			
-			// similarly for all 6 biomarkers
-			
+			if(us.getAlarmScore(user, 24*7) < 25) { 
+				interventionValue = interventionValue + "Alarm Map Alert,";
+			}
+			if(us.getToneScore(user, 24*7) < 25) { 
+				interventionValue = interventionValue + "Alarm Map Alert,";
+			}
+			if(us.getDeviceUsageScore(user, 24*7) < 25) { 
+				interventionValue = interventionValue + "High Device Usage,";
+			}
 			if(!interventionValue.equals("")) {
+				interventionValue = interventionValue.substring(0, interventionValue.length() - 1);
 				String sql = "INSERT INTO worklist_Table (userId, message, status, timestamp)\r\n" + 
 						"VALUES (:userID, :message, :status, :timestp);";
 				
@@ -81,7 +93,12 @@ public class ScheduledTasks {
 						.addValue("status", "Pending")
 						.addValue("timestp", timeStamp);
 		       
+				try {
 				namedjdbcTemplate.update(sql,namedParams);
+				}
+				catch(Exception e) {
+					System.out.println(e.getStackTrace());
+				}
 			}
 		}
 		
@@ -109,7 +126,7 @@ public class ScheduledTasks {
 			Data.add(vector);
 			
 			Queue<String> temp;
-			if(map.containsValue(vector)) {
+			if(map.containsKey(vector)) {
 				temp = map.get(vector);
 			}
 			else {
@@ -120,7 +137,9 @@ public class ScheduledTasks {
 		}
 		
 		List<? extends Cluster<DoublePoint>> res = clusterer.cluster(Data);
-		
+		for (Cluster<DoublePoint> re : res) {
+	        System.out.println(re.getPoints());
+	    }
 		try {
 			String sql0 = "DELETE FROM mhdp.peer_table;";
 			jdbcTemplate.update(sql0);
