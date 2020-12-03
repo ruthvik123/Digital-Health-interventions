@@ -168,9 +168,9 @@ public class UtilityService {
 		} else if(callDuration >= 0 & callDuration <= 3.5*60){
 			score = (double)callDuration / (double) (0.035*60);
 		} else if(callDuration > 3.5*60) {
-			score = 100 - (((double)callDuration - (3.5*60)) / ((35-3.5)*60/100));
+			score = 100 - ((((double)callDuration - (3.5*60)) / ((35-3.5)*60))*100);
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 	
 	public double getPhysicalActivityScore(String userID,  int windowInHours){
@@ -181,7 +181,7 @@ public class UtilityService {
 		} else if(physicalActivity != -1){
 			score = (double)physicalActivity / (double) (0.3);
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 	
 	public double getAmbientNoiseScore(String userID,  int windowInHours){
@@ -190,9 +190,9 @@ public class UtilityService {
 		if(ambientNoise > 60) {
 			score = 0;
 		} else if(ambientNoise != -1){
-			score = 100 - (double)ambientNoise / (double) (0.6);
+			score = 100 - ((double)ambientNoise / (double) (0.6));
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 	
 	public double getDeviceUsageScore(String userID,  int windowInHours){
@@ -201,24 +201,24 @@ public class UtilityService {
 		if(callDuration > 70*60) {
 			score = 0;
 		} else if(callDuration >= 7*60 & callDuration <= 14*60){
-			score = 100;
+			score = 75;
 		} else if(callDuration >= 0 & callDuration <= 7*60){
-			score = (double)callDuration / (double) (0.07*60);
+			score = 100 - ((double)callDuration / (double) (0.07*60*4) );
 		} else if(callDuration > 14*60) {
-			score = 100 - (((double)callDuration - (14*60)) / ((70-14)*60/100));
+			score = 75 - ((((double)callDuration - (14*60)) / ((70-14)*60))*75);
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 	
 	public double getToneScore(String userID,  int windowInHours){
 		double toneAnalysis = getToneAnalysis(userID, windowInHours);
 		double score = 50;
 		if(toneAnalysis > 42) {
-			score = 100;
+			score = 0;
 		} else if(toneAnalysis != -1){
-			score = (double)toneAnalysis / (double) (0.42);
+			score = 100 - ((double)toneAnalysis / (double) (0.42));
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 	
 	public double getAlarmScore(String userID,  int windowInHours){
@@ -227,8 +227,8 @@ public class UtilityService {
 		if(alarmCount > 5) {
 			score = 0;
 		} else if(alarmCount != -1){
-			score = 100 - (double)alarmCount * 20;
+			score = 100 - ((double)alarmCount * 20);
 		}
-		return Math.round(score);
+		return Math.round(score*100)/(double)100;
 	}
 }
