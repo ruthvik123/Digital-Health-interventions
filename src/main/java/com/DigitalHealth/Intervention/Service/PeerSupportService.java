@@ -12,7 +12,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import com.DigitalHealth.Intervention.model.PeerNotesFromApp;
 import com.DigitalHealth.Intervention.model.PeerResponse;
+import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
 
 @Component
 public class PeerSupportService {
@@ -38,5 +40,17 @@ public class PeerSupportService {
 			System.out.println(e.getStackTrace());
 			return new PeerResponse("No Group Found", new ArrayList<String>());
 		}
+	}
+	
+	public void updatePeerNotesToTable(PeerNotesFromApp response) {
+		java.util.Date date = new java.util.Date();
+		Object timeStamp = new java.sql.Timestamp(date.getTime());
+		String sql = "INSERT INTO peer_notes_table (timestamp, peerGroupId, peerId, Notes)\r\n" + 
+				"VALUES (:timestamp, :peerGroupId, :peerId, :Notes);";
+		SqlParameterSource namedParams = new MapSqlParameterSource("timestamp", timeStamp)
+				.addValue("peerGroupId", response.getPeerGroupId())
+				.addValue("peerId", response.getPeerId())
+				.addValue("Notes", response.getNotes());
+		namedjdbcTemplate.update(sql,namedParams);
 	}
 }

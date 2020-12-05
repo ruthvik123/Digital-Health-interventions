@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.DigitalHealth.Intervention.Service.PeerSupportService;
 import com.DigitalHealth.Intervention.Service.QOLService;
 import com.DigitalHealth.Intervention.Service.UtilityService;
+import com.DigitalHealth.Intervention.model.PeerNotesFromApp;
 import com.DigitalHealth.Intervention.model.PeerResponse;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
+import com.DigitalHealth.Intervention.model.QuestionnaireFromDashboard;
 
 
 @RestController
@@ -66,8 +68,34 @@ public class Controller {
     	return "success";
     }
     
+    @PostMapping("/questionnaire")
+	public String postQOL(@RequestBody QuestionnaireFromDashboard response) throws IllegalArgumentException, IllegalAccessException {
+    	try {
+    		System.out.println(response.toString());	
+    	}
+    	catch(Exception e) {
+    		System.out.println(e);
+    		return "failure";
+    	}
+    	qolService.insertQuestionnaire(response);
+    	return "success";
+    }
+    
     @GetMapping("/peer/{userID}")
     public PeerResponse getPEER(@PathVariable String userID) { 
     	return peerSupportService.getPeerGroup(userID);
+    }
+    
+    @PostMapping("/peerNotes")
+	public String postPeerNotes(@RequestBody PeerNotesFromApp response) throws IllegalArgumentException, IllegalAccessException {
+    	try {
+    		System.out.println(response.toString());	
+    	}
+    	catch(Exception e) {
+    		System.out.println(e);
+    		return "failure";
+    	}
+    	peerSupportService.updatePeerNotesToTable(response);
+    	return "success";
     }
 }

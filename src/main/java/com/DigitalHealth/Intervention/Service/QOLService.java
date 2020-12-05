@@ -21,6 +21,7 @@ import com.DigitalHealth.Intervention.model.QOLQuestionnaire;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaireDescription;
 import com.DigitalHealth.Intervention.model.QOLQuestionnaireList;
 import com.DigitalHealth.Intervention.model.QOLResponseFromApp;
+import com.DigitalHealth.Intervention.model.QuestionnaireFromDashboard;
 import com.DigitalHealth.Intervention.model.Questions;
 
 @Component
@@ -56,6 +57,14 @@ public class QOLService {
 	@Autowired
 	UtilityService us;
 	
+	public void insertQuestionnaire(QuestionnaireFromDashboard response) {
+
+			String sql = "INSERT INTO Questionnaire_table (patient_id, status)\r\n" + 
+					"VALUES (:patient_id, :status);";
+			SqlParameterSource namedParams = new MapSqlParameterSource("patient_id", response.getPatientId())
+					.addValue("status", response.getNotes());
+			namedjdbcTemplate.update(sql,namedParams);
+	}
 	
 	public QOLQuestionnaireList getQuestionnaireList(String userID) {
 		String sql = "select questionnaire_id, status from Questionnaire_table where patient_id = :patientID";
