@@ -12,10 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.Clusterable;
 import org.apache.commons.math3.ml.clustering.Clusterer;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+import org.apache.commons.math3.ml.clustering.evaluation.ClusterEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -38,6 +41,8 @@ public class ScheduledTasks {
 	@Autowired
 	UtilityService us;
 	
+	int count = 0;
+	
 	@Scheduled(fixedRate = 1000*60*60*24)
 	public void pollAllUsers() {
 		List<String> userList;
@@ -46,13 +51,19 @@ public class ScheduledTasks {
 			userList =  namedjdbcTemplate.queryForList(sql,new HashMap<String,String>(),String.class);
 			System.out.println(userList);
 			getIntervention(userList);
-			clustering(userList);
+			if(count % 30 == 0) {
+				clustering(userList);
+			}
+			triaging(userList);
+			count ++;
+			System.out.println(count);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 	}
+	
 	
 	public void getIntervention(List<String> userList) {
 		
@@ -71,10 +82,10 @@ public class ScheduledTasks {
 				interventionValue = interventionValue + "Low Physical Activity,";
 			}
 			if(us.getAlarmScore(user, 24*7) < 25) { 
-				interventionValue = interventionValue + "Alarm Map Alert,";
+				interventionValue = interventionValue + "User frequently near Bars and Liquor Stores,";
 			}
 			if(us.getToneScore(user, 24*7) < 25) { 
-				interventionValue = interventionValue + "Alarm Map Alert,";
+				interventionValue = interventionValue + "User is Depressed and Sad,";
 			}
 			if(us.getDeviceUsageScore(user, 24*7) < 25) { 
 				interventionValue = interventionValue + "High Device Usage,";
@@ -104,9 +115,9 @@ public class ScheduledTasks {
 		
 	}
 	
-	public void clustering(List<String> userList) {
+public void triaging(List<String> userList) {
 		
-		int k = (int) Math.ceil(userList.size()/10); // 10 patients in 1 grpoup
+		int k = (int) Math.ceil(3); // 10 patients in 1 grpoup
 	
 		Clusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<DoublePoint>(k);
 		Map<DoublePoint, Queue<String>> map = new HashMap();
@@ -114,13 +125,91 @@ public class ScheduledTasks {
 		
 		for(String user : userList){
 			
-			double dimensions[] = new double[5];
+			double dimensions[] = new double[6];
 			
 			dimensions[0] = (double)us.getCallScore(user, 7*24);
 			dimensions[1] = (double)us.getAmbientNoiseScore(user, 7*24);
 			dimensions[2] = (double)us.getPhysicalActivityScore(user, 7*24);
 			dimensions[3] = (double)us.getDeviceUsageScore(user, 7*24);
 			dimensions[4] = (double)us.getToneScore(user, 7*24);
+			dimensions[5] = (double)us.getAlarmScore(user, 7*24);
+			
+			DoublePoint vector = new DoublePoint(dimensions);
+			Data.add(vector);
+			
+			Queue<String> temp;
+			if(map.containsKey(vector)) {
+				temp = map.get(vector);
+			}
+			else {
+				temp = new LinkedList<String>();
+			}
+			temp.add(user);
+			map.put(vector,temp);
+		}
+		
+		List<? extends Cluster<DoublePoint>> res = clusterer.cluster(Data);
+		for (Cluster<DoublePoint> re : res) {
+	        System.out.println(re.getPoints());
+	    }
+		try {
+			String sql0 = "DELETE FROM mhdp.Triaging_Table;";
+			jdbcTemplate.update(sql0);
+			
+			int idCounter = 1;
+			
+			double distance = Double.MAX_VALUE;
+			
+			Cluster<DoublePoint> lowest = null;
+			
+			for (Cluster<DoublePoint> re : res) {
+				double dis = 0;
+				DoublePoint c = (DoublePoint) ((CentroidCluster) re).getCenter();
+				double[] n = c.getPoint();
+				for(double d : n) {
+					dis += d*d;
+				}
+				System.out.println(dis + ":::" + re.getPoints());
+				if(dis < distance) {
+					distance = dis;
+					lowest = re;
+				}
+		    }
+			
+			List<DoublePoint> points = lowest.getPoints();
+	         for(DoublePoint DP : points) {
+	        	 Queue<String> q = map.get(DP);
+	        	 String PatientName = (String) q.poll();
+	        	 String sql = "INSERT INTO Triaging_Table (userId)\r\n" + 
+	 					"VALUES ( :userID);";
+	        	 SqlParameterSource namedParams = new MapSqlParameterSource("userID", PatientName);
+	        	 namedjdbcTemplate.update(sql,namedParams);
+	         }
+		}	
+		catch(Exception e) {
+			System.out.println(e);
+		}
+
+	}
+	
+	public void clustering(List<String> userList) {
+		
+		int k = (int) Math.ceil(3); // 10 patients in 1 grpoup
+	
+		Clusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<DoublePoint>(k);
+		Map<DoublePoint, Queue<String>> map = new HashMap();
+		List<DoublePoint> Data = new ArrayList<>();
+		
+		for(String user : userList){
+			
+			double dimensions[] = new double[6];
+			
+			dimensions[0] = (double)us.getCallScore(user, 7*24);
+			dimensions[1] = (double)us.getAmbientNoiseScore(user, 7*24);
+			dimensions[2] = (double)us.getPhysicalActivityScore(user, 7*24);
+			dimensions[3] = (double)us.getDeviceUsageScore(user, 7*24);
+			dimensions[4] = (double)us.getToneScore(user, 7*24);
+			dimensions[5] = (double)us.getAlarmScore(user, 7*24);
 			
 			DoublePoint vector = new DoublePoint(dimensions);
 			Data.add(vector);
@@ -145,10 +234,15 @@ public class ScheduledTasks {
 			jdbcTemplate.update(sql0);
 			
 			int idCounter = 1;
+			int c = 0;
 			
 			for (Cluster<DoublePoint> re : res) {
 		         List<DoublePoint> points = re.getPoints();
 		         for(DoublePoint DP : points) {
+		        	 if(c == 10) {
+		        		 c = 0;
+		        		 idCounter++;
+		        	 }
 		        	 Queue<String> q = map.get(DP);
 		        	 String PatientName = (String) q.poll();
 		        	 String sql = "INSERT INTO peer_table (peergroup_id, userId)\r\n" + 
@@ -156,6 +250,7 @@ public class ScheduledTasks {
 		        	 SqlParameterSource namedParams = new MapSqlParameterSource("peergroupID", idCounter)
 		 					.addValue("userID", PatientName);
 		        	 namedjdbcTemplate.update(sql,namedParams);
+		        	 c++;
 		         }
 		        idCounter++;
 		    }
