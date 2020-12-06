@@ -91,14 +91,11 @@ public class ScheduledTasks {
 			if(us.getDeviceUsageScore(user, 24*7) < 25) { 
 				interventionValue = interventionValue + "High Device Usage,";
 			}
+			
 			if(!interventionValue.equals("")) {
 				interventionValue = interventionValue.substring(0, interventionValue.length() - 1);
-								
-//				Date date = (Date) new java.util.Date();
-//				Calendar cal = Calendar.getInstance();
-//				cal.setTime(date);
-//				cal.add(Calendar.DATE, -3);
-//				Object timeStamp = new java.sql.Timestamp(cal.getTimeInMillis());
+				
+				System.out.println(user+" HAS INTERVENTIONS");
 				
 				String sql = "INSERT INTO mhdp.worklist_Table (userId, message, status, timestamp)\r\n" + 
 						"SELECT :userID, :message, 'Pending', now() \r\n" + 
@@ -108,14 +105,14 @@ public class ScheduledTasks {
 
 				SqlParameterSource namedParams = new MapSqlParameterSource("userID", user)
 						.addValue("message", interventionValue);
-						//.addValue("status", "Pending");
-//						.addValue("timestp", timeStamp);
 		       
 				try {
 				namedjdbcTemplate.update(sql,namedParams);
 				}
 				catch(Exception e) {
-					System.out.println(e.getStackTrace());
+					System.out.println("JDBC insertion error");
+					e.printStackTrace();
+					
 				}
 			}
 		}
