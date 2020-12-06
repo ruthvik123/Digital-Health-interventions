@@ -56,7 +56,7 @@ public class ScheduledTasks {
 			}
 			triaging(userList);
 			count ++;
-			System.out.println(count);
+			//System.out.println(count);
 		}
 		catch(Exception e) {
 			e.printStackTrace();
