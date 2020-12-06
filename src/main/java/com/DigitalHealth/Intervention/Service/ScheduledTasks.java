@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,25 +91,28 @@ public class ScheduledTasks {
 			if(us.getDeviceUsageScore(user, 24*7) < 25) { 
 				interventionValue = interventionValue + "High Device Usage,";
 			}
+			
 			if(!interventionValue.equals("")) {
 				interventionValue = interventionValue.substring(0, interventionValue.length() - 1);
-				String sql = "INSERT INTO worklist_Table (userId, message, status, timestamp)\r\n" + 
-						"VALUES (:userID, :message, :status, :timestp);";
 				
-				java.util.Date date = new java.util.Date();
-				Object timeStamp = new java.sql.Timestamp(date.getTime());
+				System.out.println(user+" HAS INTERVENTIONS");
 				
-				
+				String sql = "INSERT INTO mhdp.worklist_Table (userId, message, status, timestamp)\r\n" + 
+						"SELECT :userID, :message, 'Pending', now() \r\n" + 
+						"WHERE NOT EXISTS (\r\n" + 
+						"    SELECT userId FROM mhdp.worklist_Table WHERE message = :message and userId = :userID and timestamp  >= NOW() - INTERVAL 3 DAY  \r\n" + 
+						") LIMIT 1;";
+
 				SqlParameterSource namedParams = new MapSqlParameterSource("userID", user)
-						.addValue("message", interventionValue)
-						.addValue("status", "Pending")
-						.addValue("timestp", timeStamp);
+						.addValue("message", interventionValue);
 		       
 				try {
 				namedjdbcTemplate.update(sql,namedParams);
 				}
 				catch(Exception e) {
-					System.out.println(e.getStackTrace());
+					System.out.println("JDBC insertion error");
+					e.printStackTrace();
+					
 				}
 			}
 		}
