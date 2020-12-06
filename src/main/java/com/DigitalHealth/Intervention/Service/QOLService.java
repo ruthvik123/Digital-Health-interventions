@@ -124,6 +124,8 @@ public class QOLService {
 			questions.add(new Questions(count, "Explain on what topics do you spend the most time on the phone", "Text"));
 			count++;
 		} else {
+			questions.add(new Questions(count, "Are you trying to reduce time spent on phone calls?","Yes?No"));
+			count++;
 			questions.add(new Questions(count, "How connected do you think you are with your friends and family?","Rating"));
 			count++;
 		}
@@ -132,7 +134,7 @@ public class QOLService {
 			questions.add(new Questions(count, "While messaging, how well aware are you of your surroundings","Rating"));
 			count++;
 		} else {
-			questions.add(new Questions(count, "Do you feel lonely","Yes/No"));
+			questions.add(new Questions(count, "Do you feel sad, lonely or depressed?","Yes/No"));
 			count++;
 		}
 		
@@ -147,6 +149,10 @@ public class QOLService {
 		if(physicalActivity < 50) {
 			questions.add(new Questions(count, "Does your body shape affect you mentally and hinders with your productivity?","Yes/No"));
 			count++;
+			questions.add(new Questions(count, "Are you facing any hinderence which might be preventing you from excercising?","Text"));
+			count++;
+			questions.add(new Questions(count, "Would you say you live a sedentary lifestyle?","Yes/No"));
+			count++;
 		} else {
 			questions.add(new Questions(count, "Do you think you are physically healthy?","Yes/No"));
 			count++;
@@ -156,16 +162,20 @@ public class QOLService {
 			questions.add(new Questions(count, "How stressful do you feel in your daily life?","Rating"));
 			count++;
 		} else {
-			questions.add(new Questions(count, "Would you say you live a sedentary lifestyle?","Yes/No"));
+			questions.add(new Questions(count, "Is the constant noise affecting your mental peace","Yes/No"));
+			count++;
+			questions.add(new Questions(count, "Have you faced any loss of hearing","Yes/No"));
 			count++;
 		}
 		
-		if(alarmMap >= 50) {
-			questions.add(new Questions(count, "Placeholder1","Text"));
+		if(alarmMap < 50) {
+			questions.add(new Questions(count, "What role does alcohol play in your daily life","Text"));
 			count++;
-		} else {
-			questions.add(new Questions(count, "Placeholder2","Text"));
+			questions.add(new Questions(count, "Do you think you have become addicted to alcohol?","Yes/No"));
 			count++;
+			questions.add(new Questions(count, "Do you feel less stress when you consume alcohol?","Yes/No"));
+			count++;
+			
 		}
 		insertPendingQuestions(questions,questionnaireID);
 		return new QOLQuestionnaire(questions);

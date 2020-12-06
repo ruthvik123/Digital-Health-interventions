@@ -49,12 +49,6 @@ public class Controller {
     	return qolService.getQuestionnaire(userID,questionnaireID);
     }
     
-    // API To test Utility Functions
-    @GetMapping("/test/{userID}/{window}")
-    public double testFunc(@PathVariable String userID,@PathVariable int window) { 
-    	return us.getDeviceUsage(userID, window);
-    }
-    
     @PostMapping("/qol")
 	public String postQOL(@RequestBody QOLResponseFromApp response) throws IllegalArgumentException, IllegalAccessException {
     	try {
