@@ -177,10 +177,10 @@ public class UtilityService {
 	public double getPhysicalActivityScore(String userID,  int windowInHours){
 		double physicalActivity = getPhysicalActivity(userID, windowInHours);
 		double score = 50;
-		if(physicalActivity > 30) {
+		if(physicalActivity > 150) {
 			score = 100;
 		} else if(physicalActivity != -1){
-			score = (double)physicalActivity / (double) (0.3);
+			score = (double)physicalActivity / (double) (1.5);
 		}
 		return Math.round(score*100)/(double)100;
 	}
