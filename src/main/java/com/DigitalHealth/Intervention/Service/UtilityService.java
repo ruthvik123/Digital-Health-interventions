@@ -59,7 +59,7 @@ public class UtilityService {
 				windowMilli);
 		double deviceUsage;
 		try {
-			deviceUsage = namedjdbcTemplate.queryForObject(sql, namedParams, Integer.class);
+			deviceUsage = namedjdbcTemplate.queryForObject(sql, namedParams, Double.class);
 			return deviceUsage;
 
 		} catch (Exception e) {
@@ -197,16 +197,16 @@ public class UtilityService {
 	}
 	
 	public double getDeviceUsageScore(String userID,  int windowInHours){
-		double callDuration = getCallDuration(userID, windowInHours);
+		double deviceUsage = getDeviceUsage(userID, windowInHours);
 		double score = 50;
-		if(callDuration > 70*60) {
+		if(deviceUsage > 70*60*60*1000) {
 			score = 0;
-		} else if(callDuration >= 7*60 & callDuration <= 14*60){
+		} else if(deviceUsage >= 7*60*60*1000 & deviceUsage <= 14*60*60*1000){
 			score = 75;
-		} else if(callDuration >= 0 & callDuration <= 7*60){
-			score = 100 - ((double)callDuration / (double) (0.07*60*4) );
-		} else if(callDuration > 14*60) {
-			score = 75 - ((((double)callDuration - (14*60)) / ((70-14)*60))*75);
+		} else if(deviceUsage >= 0 & deviceUsage <= 7*60*60*1000){
+			score = 100 - ((double)deviceUsage / (double) (0.07*60*60*1000*4) );
+		} else if(deviceUsage > 14*60*60*1000) {
+			score = 75 - ((((double)deviceUsage - (14*60*60*1000)) / ((70-14)*60*60*1000))*75);
 		}
 		return Math.round(score*100)/(double)100;
 	}
